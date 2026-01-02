@@ -44,53 +44,55 @@ export default function TradesTable({
     }
 
     // compute per-trade values
-    const rows = shibaInuTrades.map((t) => {
-        const cur = prices[t.tokenId] ?? {};
-        const currentPriceEUR = cur.eur ?? null;
-        const currentPriceUSD = cur.usd ?? null;
+    const rows = shibaInuTrades
+        .sort((a, b) => a.priceAtTrade - b.priceAtTrade) // Sort by priceAtTrade descending
+        .map((t) => {
+            const cur = prices[t.tokenId] ?? {};
+            const currentPriceEUR = cur.eur ?? null;
+            const currentPriceUSD = cur.usd ?? null;
 
-        // expense in both currencies
-        let expenseEUR = null as number | null;
-        let expenseUSD = null as number | null;
-        if (t.tradeCurrency === 'EUR') {
-            expenseEUR = t.amount * t.priceAtTrade;
-            expenseUSD = eurUsd ? expenseEUR * eurUsd : null;
-        } else {
-            expenseUSD = t.amount * t.priceAtTrade;
-            expenseEUR = eurUsd ? expenseUSD / eurUsd : null;
-        }
+            // expense in both currencies
+            let expenseEUR = null as number | null;
+            let expenseUSD = null as number | null;
+            if (t.tradeCurrency === 'EUR') {
+                expenseEUR = t.amount * t.priceAtTrade;
+                expenseUSD = eurUsd ? expenseEUR * eurUsd : null;
+            } else {
+                expenseUSD = t.amount * t.priceAtTrade;
+                expenseEUR = eurUsd ? expenseUSD / eurUsd : null;
+            }
 
-        const currentValueEUR =
-            currentPriceEUR != null ? t.amount * currentPriceEUR : null;
-        const currentValueUSD =
-            currentPriceUSD != null ? t.amount * currentPriceUSD : null;
+            const currentValueEUR =
+                currentPriceEUR != null ? t.amount * currentPriceEUR : null;
+            const currentValueUSD =
+                currentPriceUSD != null ? t.amount * currentPriceUSD : null;
 
-        const profitEUR =
-            currentValueEUR != null && expenseEUR != null
-                ? currentValueEUR - expenseEUR
-                : null;
-        const profitUSD =
-            currentValueUSD != null && expenseUSD != null
-                ? currentValueUSD - expenseUSD
-                : null;
-        const profitPct =
-            profitEUR != null && expenseEUR != null && expenseEUR !== 0
-                ? (profitEUR / expenseEUR) * 100
-                : null;
+            const profitEUR =
+                currentValueEUR != null && expenseEUR != null
+                    ? currentValueEUR - expenseEUR
+                    : null;
+            const profitUSD =
+                currentValueUSD != null && expenseUSD != null
+                    ? currentValueUSD - expenseUSD
+                    : null;
+            const profitPct =
+                profitEUR != null && expenseEUR != null && expenseEUR !== 0
+                    ? (profitEUR / expenseEUR) * 100
+                    : null;
 
-        return {
-            trade: t,
-            currentPriceEUR,
-            currentPriceUSD,
-            expenseEUR,
-            expenseUSD,
-            currentValueEUR,
-            currentValueUSD,
-            profitEUR,
-            profitUSD,
-            profitPct,
-        };
-    });
+            return {
+                trade: t,
+                currentPriceEUR,
+                currentPriceUSD,
+                expenseEUR,
+                expenseUSD,
+                currentValueEUR,
+                currentValueUSD,
+                profitEUR,
+                profitUSD,
+                profitPct,
+            };
+        });
 
     // totals
     const totals = rows.reduce(
@@ -117,6 +119,42 @@ export default function TradesTable({
         totals.expenseEUR !== 0
             ? (totals.profitEUR / totals.expenseEUR) * 100
             : null;
+
+    // Find the last profitable trade index
+    const lastProfitableIndex = rows.reduce((lastIndex, row, index) => {
+        const isProfitable = (row.profitEUR != null && row.profitEUR > 0) ||
+            (row.profitUSD != null && row.profitUSD > 0);
+        return isProfitable ? index : lastIndex;
+    }, -1);
+
+    // Calculate totals up to the last profitable trade
+    const partialTotals = lastProfitableIndex >= 0 ? rows.slice(0, lastProfitableIndex + 1).reduce(
+        (acc, r) => {
+            acc.expenseEUR += r.expenseEUR ?? 0;
+            acc.expenseUSD += r.expenseUSD ?? 0;
+            acc.currentValueEUR += r.currentValueEUR ?? 0;
+            acc.currentValueUSD += r.currentValueUSD ?? 0;
+            acc.profitEUR += r.profitEUR ?? 0;
+            acc.profitUSD += r.profitUSD ?? 0;
+            return acc;
+        },
+        {
+            expenseEUR: 0,
+            expenseUSD: 0,
+            currentValueEUR: 0,
+            currentValueUSD: 0,
+            profitEUR: 0,
+            profitUSD: 0,
+        }
+    ) : null;
+
+    const partialProfitPct = partialTotals && partialTotals.expenseEUR !== 0
+        ? (partialTotals.profitEUR / partialTotals.expenseEUR) * 100
+        : null;
+
+    const partialAmount = lastProfitableIndex >= 0
+        ? rows.slice(0, lastProfitableIndex + 1).reduce((sum, r) => sum + r.trade.amount, 0)
+        : 0;
 
     if (shibaInuTrades.length === 0) {
         return (
@@ -151,96 +189,182 @@ export default function TradesTable({
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {rows.map((r) => (
-                                <TableRow key={r.trade.id}>
-                                    <TableCell>
-                                        <code>{r.trade.date}</code>
-                                    </TableCell>
-                                    <TableCell className="font-medium">
-                                        <code>
-                                            {r.trade.symbol}
-                                        </code>
-                                    </TableCell>
-                                    <TableCell>
-                                        <code>
-                                            {r.trade.priceAtTrade}
-                                        </code>
-                                    </TableCell>
-                                    <TableCell className='text-right'>
-                                        <code>
-                                            {format(r.trade.amount)}
-                                        </code>
-                                    </TableCell>
-                                    <TableCell className='text-right'>
-                                        <code>
-                                            {r.expenseEUR
-                                                ? format(r.expenseEUR)
-                                                : r.expenseUSD
-                                                    ? format(r.expenseUSD)
-                                                    : '0,00'}{' '}
-                                            {r.expenseEUR
-                                                ? '€'
-                                                : r.expenseUSD
-                                                    ? '$'
-                                                    : '~'}
-                                        </code>
-                                    </TableCell>
-                                    <TableCell className='text-right'>
-                                        <code>
-                                            {r.currentValueEUR
-                                                ? format(r.currentValueEUR)
-                                                : r.currentValueUSD
-                                                    ? format(r.currentValueUSD)
-                                                    : '0,00'}{' '}
-                                            {r.currentValueEUR
-                                                ? '€'
-                                                : r.currentValueUSD
-                                                    ? '$'
-                                                    : '~'}
-                                        </code>
-                                    </TableCell>
-                                    <TableCell className='text-right'>
-                                        <code>
-                                            <span
-                                                className={
-                                                    r.profitPct != null &&
-                                                        r.profitPct > 0
-                                                        ? 'text-green-600 dark:text-green-500'
-                                                        : 'text-rose-600 dark:text-rose-500'
-                                                }
-                                            >
-                                                {r.profitPct != null
-                                                    ? `${format(
-                                                        r.profitPct
-                                                    )} %`
-                                                    : '—'}
-                                            </span>
-                                        </code>
-                                    </TableCell>
-                                    <TableCell className='text-right'>
-                                        <code>
-                                            <span
-                                                className={
-                                                    r.profitEUR != null &&
-                                                        r.profitEUR > 0
-                                                        ? 'text-green-600 dark:text-green-500'
-                                                        : 'text-rose-600 dark:text-rose-500'
-                                                }
-                                            >
-                                                {r.profitEUR
-                                                    ? format(r.profitEUR)
-                                                    : r.profitUSD
-                                                        ? format(r.profitUSD)
+                            {rows.map((r, index) => (
+                                <React.Fragment key={r.trade.id}>
+                                    <TableRow>
+                                        <TableCell>
+                                            <code>{r.trade.date}</code>
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            <code>
+                                                {r.trade.symbol}
+                                            </code>
+                                        </TableCell>
+                                        <TableCell>
+                                            <code>
+                                                {r.trade.priceAtTrade}
+                                            </code>
+                                        </TableCell>
+                                        <TableCell className='text-right'>
+                                            <code>
+                                                {format(r.trade.amount)}
+                                            </code>
+                                        </TableCell>
+                                        <TableCell className='text-right'>
+                                            <code>
+                                                {r.expenseEUR
+                                                    ? format(r.expenseEUR)
+                                                    : r.expenseUSD
+                                                        ? format(r.expenseUSD)
                                                         : '0,00'}{' '}
-                                                {r.profitEUR
+                                                {r.expenseEUR
                                                     ? '€'
-                                                    : r.profitUSD
+                                                    : r.expenseUSD
                                                         ? '$'
                                                         : '~'}
-                                            </span>
-                                        </code>
-                                    </TableCell>
-                                </TableRow>
+                                            </code>
+                                        </TableCell>
+                                        <TableCell className='text-right'>
+                                            <code>
+                                                {r.currentValueEUR
+                                                    ? format(r.currentValueEUR)
+                                                    : r.currentValueUSD
+                                                        ? format(r.currentValueUSD)
+                                                        : '0,00'}{' '}
+                                                {r.currentValueEUR
+                                                    ? '€'
+                                                    : r.currentValueUSD
+                                                        ? '$'
+                                                        : '~'}
+                                            </code>
+                                        </TableCell>
+                                        <TableCell className='text-right'>
+                                            <code>
+                                                <span
+                                                    className={
+                                                        r.profitPct != null &&
+                                                            r.profitPct > 0
+                                                            ? 'text-green-600 dark:text-green-500'
+                                                            : 'text-rose-600 dark:text-rose-500'
+                                                    }
+                                                >
+                                                    {r.profitPct != null
+                                                        ? `${format(
+                                                            r.profitPct
+                                                        )} %`
+                                                        : '—'}
+                                                </span>
+                                            </code>
+                                        </TableCell>
+                                        <TableCell className='text-right'>
+                                            <code>
+                                                <span
+                                                    className={
+                                                        r.profitEUR != null &&
+                                                            r.profitEUR > 0
+                                                            ? 'text-green-600 dark:text-green-500'
+                                                            : 'text-rose-600 dark:text-rose-500'
+                                                    }
+                                                >
+                                                    {r.profitEUR
+                                                        ? format(r.profitEUR)
+                                                        : r.profitUSD
+                                                            ? format(r.profitUSD)
+                                                            : '0,00'}{' '}
+                                                    {r.profitEUR
+                                                        ? '€'
+                                                        : r.profitUSD
+                                                            ? '$'
+                                                            : '~'}
+                                                </span>
+                                            </code>
+                                        </TableCell>
+                                    </TableRow>
+                                    {/* Insert partial totals row after last profitable trade */}
+                                    {index === lastProfitableIndex && partialTotals && (
+                                        <TableRow className="bg-muted/50 border-t-2 border-b-2">
+                                            <TableCell className="font-semibold text-[14px]">
+                                                <code>
+                                                    subtotal
+                                                </code>
+                                            </TableCell>
+                                            <TableCell />
+                                            <TableCell />
+                                            <TableCell className="font-semibold text-right text-[14px]">
+                                                <code>
+                                                    {format(partialAmount)}
+                                                </code>
+                                            </TableCell>
+                                            <TableCell className="font-semibold text-right text-[14px]">
+                                                <code>
+                                                    {partialTotals.expenseEUR
+                                                        ? format(partialTotals.expenseEUR)
+                                                        : partialTotals.expenseUSD
+                                                            ? format(partialTotals.expenseUSD)
+                                                            : '0,00'}{' '}
+                                                    {partialTotals.expenseEUR
+                                                        ? '€'
+                                                        : partialTotals.expenseUSD
+                                                            ? '$'
+                                                            : '~'}
+                                                </code>
+                                            </TableCell>
+                                            <TableCell className="font-semibold text-right text-[14px]">
+                                                <code>
+                                                    {partialTotals.currentValueEUR
+                                                        ? format(partialTotals.currentValueEUR)
+                                                        : partialTotals.currentValueUSD
+                                                            ? format(partialTotals.currentValueUSD)
+                                                            : '0,00'}{' '}
+                                                    {partialTotals.currentValueEUR
+                                                        ? '€'
+                                                        : partialTotals.currentValueUSD
+                                                            ? '$'
+                                                            : '~'}
+                                                </code>
+                                            </TableCell>
+                                            <TableCell className="font-semibold text-right text-[14px]">
+                                                <code>
+                                                    <span
+                                                        className={
+                                                            partialProfitPct != null &&
+                                                                partialProfitPct > 0
+                                                                ? 'text-green-600 dark:text-green-500'
+                                                                : 'text-rose-600 dark:text-rose-500'
+                                                        }
+                                                    >
+                                                        {partialProfitPct != null
+                                                            ? `${format(partialProfitPct)} %`
+                                                            : '—'}
+                                                    </span>
+                                                </code>
+                                            </TableCell>
+                                            <TableCell className="font-semibold text-right text-[14px]">
+                                                <code>
+                                                    <span
+                                                        className={
+                                                            partialTotals.profitEUR != null &&
+                                                                partialTotals.profitEUR > 0
+                                                                ? 'text-green-600 dark:text-green-500'
+                                                                : 'text-rose-600 dark:text-rose-500'
+                                                        }
+                                                    >
+                                                        {partialTotals.profitEUR
+                                                            ? format(partialTotals.profitEUR)
+                                                            : partialTotals.profitUSD
+                                                                ? format(partialTotals.profitUSD)
+                                                                : '0,00'}{' '}
+                                                        {partialTotals.profitEUR
+                                                            ? '€'
+                                                            : partialTotals.profitUSD
+                                                                ? '$'
+                                                                : '~'}
+                                                    </span>
+                                                </code>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </React.Fragment>
                             ))}
                         </TableBody>
                         <TableFooter>
