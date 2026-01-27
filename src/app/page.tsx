@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import AddTradeForm, { type Trade } from "../components/AddTradeForm";
-import TradesTable from "../components/TradesTable";
+import TradesTable from "../components/trades-table/table";
 
 const LS_KEY = "my_trades_v1";
 
@@ -68,6 +68,14 @@ export default function Home() {
         setTrades((s) => s.filter((t) => t.id !== id));
     }
 
+    function handleSell(id: string, sellDate: string, sellPrice: number) {
+        setTrades((s) =>
+            s.map((t) =>
+                t.id === id ? { ...t, sell: { date: sellDate, price: sellPrice }, active: false } : t
+            )
+        );
+    }
+
     return (
         <div className="min-h-screen bg-background py-8 px-4">
             <main className="mx-auto w-full max-w-7xl space-y-8">
@@ -83,7 +91,7 @@ export default function Home() {
                         <AddTradeForm onAdd={handleAdd} />
                     </div>
                     <div className="sm:col-span-9">
-                        <TradesTable trades={trades} onDelete={handleDelete} prices={prices} eurUsd={eurUsd} />
+                        <TradesTable trades={trades} onDelete={handleDelete} onSell={handleSell} prices={prices} eurUsd={eurUsd} />
                     </div>
                 </div>
             </main>
