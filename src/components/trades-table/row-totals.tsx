@@ -56,7 +56,7 @@ export const TotalsRow = ({
         <TableRow
             className={cn(
                 "border-t-2 border-b-2",
-                typeof delta.nominal === 'number' && delta.nominal !== 0 ? (
+                isSubtotal && typeof delta.nominal === 'number' && delta.nominal !== 0 ? (
                     delta.nominal > 0 ?
                         'bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-50' :
                         'bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:text-rose-50'

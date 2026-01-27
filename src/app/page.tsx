@@ -1,80 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import AddTradeForm, { type Trade } from "../components/AddTradeForm";
+import React from "react";
+import AddTradeForm from "../components/AddTradeForm";
 import TradesTable from "../components/trades-table/table";
-
-const LS_KEY = "my_trades_v1";
-
-type PricesApiResponse = {
-    prices: Record<string, { usd?: number; eur?: number }>;
-    rates: { EUR_USD: number | null };
-} | { error: string };
+import { useTrades } from "@/hooks/trades";
+import { usePrices } from "@/hooks/prices";
 
 export default function Home() {
-    const [shib, setShib] = useState<string>("0.00000600");
-    const [trades, setTrades] = useState<Trade[]>([]);
-    const [prices, setPrices] = useState<Record<string, { usd?: number; eur?: number }>>({});
-    const [eurUsd, setEurUsd] = useState<number | null>(null);
+    const { trades, addTrade, deleteTrade, sellTrade } = useTrades();
+    const { prices, rates } = usePrices(['shiba-inu']);
 
-    useEffect(() => {
-        try {
-            const raw = localStorage.getItem(LS_KEY);
-            if (raw) setTrades(JSON.parse(raw));
-        } catch (e) {
-            console.error(e);
-        }
-    }, []);
-
-    useEffect(() => {
-        try {
-            localStorage.setItem(LS_KEY, JSON.stringify(trades));
-        } catch (e) {
-            console.error(e);
-        }
-    }, [trades]);
-
-    useEffect(() => {
-        const fetchPrices = () => {
-            fetch(`/api/prices?ids=shiba-inu`)
-                .then((r) => r.json())
-                .then((data: PricesApiResponse) => {
-                    if ("error" in data) {
-                        console.error("Prices API error:", data.error);
-                        return;
-                    }
-                    setPrices(data.prices || {});
-                    setEurUsd(data.rates?.EUR_USD ?? null);
-                    setShib(data.prices['shiba-inu'].eur?.toFixed(8) || "0.00000600");
-                })
-                .catch((e) => console.error(e));
-        };
-
-        // Then fetch every 20 seconds
-        const interval = setInterval(fetchPrices, 20000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    function handleAdd(t: Trade) {
-        setTrades((s) => [t, ...s]);
-    }
-
-    function handleAddMany(ts: Trade[]) {
-        setTrades((s) => [...ts, ...s]);
-    }
-
-    function handleDelete(id: string) {
-        setTrades((s) => s.filter((t) => t.id !== id));
-    }
-
-    function handleSell(id: string, sellDate: string, sellPrice: number) {
-        setTrades((s) =>
-            s.map((t) =>
-                t.id === id ? { ...t, sell: { date: sellDate, price: sellPrice }, active: false } : t
-            )
-        );
-    }
+    const shib = prices['shiba-inu']?.eur?.toFixed(8) || "0.00000600";
 
     return (
         <div className="min-h-screen bg-background py-8 px-4">
@@ -88,10 +24,10 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                     <div className="sm:col-span-3">
-                        <AddTradeForm onAdd={handleAdd} />
+                        <AddTradeForm onAdd={addTrade} />
                     </div>
                     <div className="sm:col-span-9">
-                        <TradesTable trades={trades} onDelete={handleDelete} onSell={handleSell} prices={prices} eurUsd={eurUsd} />
+                        <TradesTable trades={trades} onDelete={deleteTrade} onSell={sellTrade} prices={prices} rates={rates} />
                     </div>
                 </div>
             </main>
