@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Trade } from '@/components/AddTradeForm';
+import { LS_KEY } from '@/constants/keys';
 
-const LS_KEY = 'my_trades_v1';
+
 
 export function useTrades() {
     const [trades, setTrades] = useState<Trade[]>([]);

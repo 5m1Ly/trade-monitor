@@ -1,13 +1,51 @@
 [
     {
+        "id": "1774870139775",
+        "tokenId": "shiba-inu",
+        "symbol": "SHIB",
+        "amount": 19369883.203723855,
+        "currency": "EUR",
+        "active": true,
+        "buy": {
+            "price": 0.00000480,
+            "date": "2026-02-05"
+        },
+        "sell": {
+            "price": null,
+            "date": null
+        }
+    },
+    {
+        "id": "1774869906085",
+        "tokenId": "shiba-inu",
+        "symbol": "SHIB",
+        "amount": 11770818.10162590880965274,
+        "currency": "EUR",
+        "active": true,
+        "buy": {
+            "price": 0.00000490,
+            "date": "2026-01-31"
+        },
+        "sell": {
+            "price": null,
+            "date": null
+        }
+    },
+    {
         "id": "1769448537140",
         "tokenId": "shiba-inu",
         "symbol": "SHIB",
         "amount": 7875102.685761878,
         "currency": "EUR",
-        "buy": { "price": 0.00000629, "date": "2026-01-25" },
+        "buy": {
+            "price": 0.00000629,
+            "date": "2026-01-25"
+        },
         "active": true,
-        "sell": { "price": null, "date": null }
+        "sell": {
+            "price": null,
+            "date": null
+        }
     },
     {
         "id": "1769448515411",
@@ -15,9 +53,15 @@
         "symbol": "SHIB",
         "amount": 14997208.470972268,
         "currency": "EUR",
-        "buy": { "price": 0.0000066, "date": "2026-01-25" },
+        "buy": {
+            "price": 0.0000066,
+            "date": "2026-01-25"
+        },
         "active": true,
-        "sell": { "price": null, "date": null }
+        "sell": {
+            "price": null,
+            "date": null
+        }
     },
     {
         "id": "1769448491759",
@@ -25,9 +69,15 @@
         "symbol": "SHIB",
         "amount": 2983393.6299598515,
         "currency": "EUR",
-        "buy": { "price": 0.00000665, "date": "2026-01-20" },
+        "buy": {
+            "price": 0.00000665,
+            "date": "2026-01-20"
+        },
         "active": true,
-        "sell": { "price": null, "date": null }
+        "sell": {
+            "price": null,
+            "date": null
+        }
     },
     {
         "id": "1769448473789",
@@ -35,9 +85,15 @@
         "symbol": "SHIB",
         "amount": 8679895.892072165,
         "currency": "EUR",
-        "buy": { "price": 0.00000674, "date": "2026-01-19" },
+        "buy": {
+            "price": 0.00000674,
+            "date": "2026-01-19"
+        },
         "active": true,
-        "sell": { "price": null, "date": null }
+        "sell": {
+            "price": null,
+            "date": null
+        }
     },
     {
         "id": "1769448452071",
@@ -45,9 +101,15 @@
         "symbol": "SHIB",
         "amount": 2796617.989248914,
         "currency": "EUR",
-        "buy": { "price": 0.00000708, "date": "2026-01-16" },
+        "buy": {
+            "price": 0.00000708,
+            "date": "2026-01-16"
+        },
         "active": true,
-        "sell": { "price": null, "date": null }
+        "sell": {
+            "price": null,
+            "date": null
+        }
     },
     {
         "id": "1767318061098",
@@ -55,9 +117,15 @@
         "symbol": "SHIB",
         "amount": 19891489.885786925,
         "currency": "EUR",
-        "buy": { "price": 0.0000059, "date": "2026-01-01" },
+        "buy": {
+            "price": 0.0000059,
+            "date": "2026-01-01"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767318041743",
@@ -65,9 +133,15 @@
         "symbol": "SHIB",
         "amount": 1073213.3367439113,
         "currency": "EUR",
-        "buy": { "price": 0.00000599, "date": "2025-12-18" },
+        "buy": {
+            "price": 0.00000599,
+            "date": "2025-12-18"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767318022189",
@@ -75,9 +149,15 @@
         "symbol": "SHIB",
         "amount": 1637677.5230555718,
         "currency": "EUR",
-        "buy": { "price": 0.00000604, "date": "2025-12-18" },
+        "buy": {
+            "price": 0.00000604,
+            "date": "2025-12-18"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767318007337",
@@ -85,9 +165,15 @@
         "symbol": "SHIB",
         "amount": 2033080.8369887064,
         "currency": "EUR",
-        "buy": { "price": 0.00000632, "date": "2025-12-18" },
+        "buy": {
+            "price": 0.00000632,
+            "date": "2025-12-18"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767317988105",
@@ -95,9 +181,15 @@
         "symbol": "SHIB",
         "amount": 2296056.9101791545,
         "currency": "EUR",
-        "buy": { "price": 0.00000646, "date": "2025-12-17" },
+        "buy": {
+            "price": 0.00000646,
+            "date": "2025-12-17"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767317968425",
@@ -105,9 +197,15 @@
         "symbol": "SHIB",
         "amount": 3057964.365243128,
         "currency": "EUR",
-        "buy": { "price": 0.00000647, "date": "2025-12-17" },
+        "buy": {
+            "price": 0.00000647,
+            "date": "2025-12-17"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767317948799",
@@ -115,9 +213,15 @@
         "symbol": "SHIB",
         "amount": 4452758.500507788,
         "currency": "EUR",
-        "buy": { "price": 0.00000667, "date": "2025-12-15" },
+        "buy": {
+            "price": 0.00000667,
+            "date": "2025-12-15"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767317919914",
@@ -125,9 +229,15 @@
         "symbol": "SHIB",
         "amount": 5029627.9247844545,
         "currency": "EUR",
-        "buy": { "price": 0.00000689, "date": "2025-12-14" },
+        "buy": {
+            "price": 0.00000689,
+            "date": "2025-12-14"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767317889953",
@@ -135,9 +245,15 @@
         "symbol": "SHIB",
         "amount": 7106489.112109042,
         "currency": "EUR",
-        "buy": { "price": 0.00000689, "date": "2025-12-14" },
+        "buy": {
+            "price": 0.00000689,
+            "date": "2025-12-14"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767317868390",
@@ -145,9 +261,15 @@
         "symbol": "SHIB",
         "amount": 591175.7751770873,
         "currency": "EUR",
-        "buy": { "price": 0.00000699, "date": "2025-12-14" },
+        "buy": {
+            "price": 0.00000699,
+            "date": "2025-12-14"
+        },
         "active": false,
-        "sell": { "date": "2026-01-02", "price": 0.00000708 }
+        "sell": {
+            "date": "2026-01-02",
+            "price": 0.00000708
+        }
     },
     {
         "id": "1767317845605",
@@ -155,9 +277,15 @@
         "symbol": "SHIB",
         "amount": 9846272.367962627,
         "currency": "EUR",
-        "buy": { "price": 0.00000704, "date": "2025-12-11" },
+        "buy": {
+            "price": 0.00000704,
+            "date": "2025-12-11"
+        },
         "active": true,
-        "sell": { "price": null, "date": null }
+        "sell": {
+            "price": null,
+            "date": null
+        }
     },
     {
         "id": "1767317780147",
@@ -165,8 +293,14 @@
         "symbol": "SHIB",
         "amount": 13729603.285751913,
         "currency": "EUR",
-        "buy": { "price": 0.0000072, "date": "2025-12-05" },
+        "buy": {
+            "price": 0.0000072,
+            "date": "2025-12-05"
+        },
         "active": true,
-        "sell": { "price": null, "date": null }
+        "sell": {
+            "price": null,
+            "date": null
+        }
     }
 ]

@@ -1,8 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { DEF_EUR_USD_RATE, DEF_USD_EUR_RATE, FETCH_INTERVAL, LS_PRICES_KEY, LS_RATES_KEY } from '@/constants/keys';
 
-const LS_PRICES_KEY = 'cached_prices_v1';
-const LS_RATES_KEY = 'cached_rates_v1';
-const FETCH_INTERVAL = 20000; // 20 seconds
+
 
 type PricesApiResponse = {
     prices: PricesRecord;
@@ -24,49 +23,34 @@ type CachedRates = {
 };
 
 export function usePrices(tokenIds: string[] = ['shiba-inu']) {
-    const [prices, setPrices] = useState<PricesRecord>(() => {
-        // Initialize from localStorage cache
+    const [prices, setPrices] = useState<PricesRecord>({});
+    const [rates, setRates] = useState<RatesRecord>({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+    // Hydrate from localStorage cache on mount (client-only)
+    useEffect(() => {
         try {
-            const cached = localStorage.getItem(LS_PRICES_KEY);
-            if (cached) {
-                const parsed: CachedPrices = JSON.parse(cached);
-                return parsed.prices;
+            const cachedPrices = localStorage.getItem(LS_PRICES_KEY);
+            if (cachedPrices) {
+                const parsed: CachedPrices = JSON.parse(cachedPrices);
+                setPrices(parsed.prices);
+                setLastUpdated(new Date(parsed.timestamp));
             }
         } catch (e) {
             console.error('Failed to load cached prices:', e);
         }
-        return {};
-    });
-
-    const [rates, setRates] = useState<RatesRecord>(() => {
-        // Initialize from localStorage cache
         try {
-            const cached = localStorage.getItem(LS_RATES_KEY);
-            if (cached) {
-                const parsed: CachedRates = JSON.parse(cached);
-                return parsed.rates;
+            const cachedRates = localStorage.getItem(LS_RATES_KEY);
+            if (cachedRates) {
+                const parsed: CachedRates = JSON.parse(cachedRates);
+                setRates(parsed.rates);
             }
         } catch (e) {
             console.error('Failed to load cached rates:', e);
         }
-        return {};
-    });
-
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [lastUpdated, setLastUpdated] = useState<Date | null>(() => {
-        // Get last update timestamp from cache
-        try {
-            const cached = localStorage.getItem(LS_PRICES_KEY);
-            if (cached) {
-                const parsed: CachedPrices = JSON.parse(cached);
-                return new Date(parsed.timestamp);
-            }
-        } catch (e) {
-            // Ignore
-        }
-        return null;
-    });
+    }, []);
 
     const fetchPrices = useCallback(async () => {
         if (tokenIds.length === 0) return;
@@ -84,14 +68,21 @@ export function usePrices(tokenIds: string[] = ['shiba-inu']) {
             }
 
             const _prices = data.prices || {};
+
             const _rates = Object.fromEntries(
-                tokenIds.map((id) => [
-                    id,
-                    {
-                        usd: _prices[id]?.eur! / _prices[id]?.usd!,
-                        eur: _prices[id]?.usd! / _prices[id]?.eur!
-                    }
-                ])
+                tokenIds.map((id) => {
+                    const { eur, usd } = _prices[id] || {};
+                    return [
+                        id,
+                        (eur && usd) ? {
+                            usd: eur / usd,
+                            eur: usd / eur
+                        } : {
+                            usd: DEF_EUR_USD_RATE,
+                            eur: DEF_USD_EUR_RATE
+                        }
+                    ]
+                })
             );
             const timestamp = Date.now();
 
@@ -120,7 +111,7 @@ export function usePrices(tokenIds: string[] = ['shiba-inu']) {
         } finally {
             setIsLoading(false);
         }
-    }, [tokenIds]);
+    }, [tokenIds, rates]);
 
     // Fetch prices on mount and set up interval
     useEffect(() => {
